@@ -6,16 +6,16 @@ const KEY_UP = "ArrowUp"
 function handleHeadMove(e) {
     switch (e.key) {
         case KEY_RIGHT:
-            head.innerText = "🢂";
+            head.innerText = "→";
             break
         case KEY_DOWM:
-            head.innerText = "🢃";
+            head.innerText = "↓";
             break
         case KEY_LEFT:
-            head.innerText = "🢀";
+            head.innerText = "←";
             break
         case KEY_UP:
-            head.innerText = "🢁";
+            head.innerText = "↑";
             break
     }
 }
