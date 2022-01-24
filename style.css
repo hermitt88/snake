@@ -1,0 +1,9 @@
+body {
+    box-sizing: border-box;
+}
+
+#map {
+    border: black 1px solid;
+    width: 500px;
+    height: 500px;
+}
