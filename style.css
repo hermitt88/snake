@@ -1,44 +1,10 @@
 body {
-    box-sizing: border-box;
+    /* box-sizing: border-box; */
+    margin: 0;
+    padding: 0;
 }
 
-#map {
-    border: black 1px solid;
-    width: 500px;
-    height: 500px;
-}
-
-.snake {
-    width: 50px;
-    height: 50px;
-    position: relative;
-}
-
-.down {
-    width: 20px;
-    height: 0;
-    border-left: 15px solid transparent;
-    border-right: 15px solid transparent;
-    border-top: 50px solid black;
-}
-.left {
-    width: 0;
-    height: 20px;
-    border-right: 50px solid black;
-    border-top: 15px solid transparent;
-    border-bottom: 15px solid transparent;
-}
-.up {
-    width: 20px;
-    height: 0;
-    border-left: 15px solid transparent;
-    border-right: 15px solid transparent;
-    border-bottom: 50px solid black;
-}
-.right {
-    width: 0;
-    height: 20px;
-    border-left: 50px solid black;
-    border-top: 15px solid transparent;
-    border-bottom: 15px solid transparent;
+#gameCanvas {
+    border-bottom: 5px dashed black;
+    border-right: 5px dashed black;
 }
