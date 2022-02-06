@@ -1,5 +1,8 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
+
+canvas.width = 400;
+canvas.height = 400;
 const canvasW = canvas.width;
 const canvasH = canvas.height;
 
@@ -8,11 +11,11 @@ const KEY_DOWN = "ArrowDown"
 const KEY_LEFT = "ArrowLeft"
 const KEY_UP = "ArrowUp"
 
-const dx = 20;
-const dy = 20;
+const gap = 20;
 
 const form = document.querySelector("form");
 
+let snake = [[180, 180]];
 let x = 180;
 let y = 180;
 let snakeInterval = 300;
@@ -27,23 +30,23 @@ function snakeGame() {
 }
 
 function moveSnake() {
-    if (x > 0 && y > 0 && x < canvasW - dx && y < canvasH - dy) {
+    if (x >= 0 && y >= 0 && x <= canvasW - gap && y <= canvasH - gap) {
         removeSnakeBlock(x, y);
         switch (direction) {
             case "right":
-                x += dx;
+                x += gap;
                 paintSnakeBlock(x, y);
                 break
             case "down":
-                y += dy;
+                y += gap;
                 paintSnakeBlock(x, y);
                 break
             case "left":
-                x -= dx;
+                x -= gap;
                 paintSnakeBlock(x, y);
                 break
             case "up":
-                y -= dy;
+                y -= gap;
                 paintSnakeBlock(x, y);
                 break
         }
@@ -62,11 +65,11 @@ function initialSetting() {
 }
 
 function paintSnakeBlock(x, y) {
-    ctx.fillRect(x+1, y+1, 18, 18);
+    ctx.fillRect(x+1, y+1, gap-2, gap-2);
 }
 
 function removeSnakeBlock(x, y) {
-    ctx.clearRect(x, y, 20, 20);
+    ctx.clearRect(x+1, y+1, gap-2, gap-2);
 }
 
 function handleClear(e) {
