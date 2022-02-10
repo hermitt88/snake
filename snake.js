@@ -3,8 +3,8 @@ const ctx = canvas.getContext("2d");
 
 document.body.style.overflow = "hidden";
 
-canvas.width = 400; // Multiples of "20"
-canvas.height = 400;
+canvas.width = 360; // Multiples of "20"
+canvas.height = 360;
 const canvasW = canvas.width;
 const canvasH = canvas.height;
 
@@ -16,7 +16,7 @@ const KEY_DOWN = "ArrowDown"
 const KEY_LEFT = "ArrowLeft"
 const KEY_UP = "ArrowUp"
 
-const gap = 20;
+const gap = 18;
 
 const form = document.querySelector("form");
 
@@ -71,7 +71,7 @@ function handleGesure() {
 
 function putApple() {
     while (apple.length === 0 || JSON.stringify(snake).includes(JSON.stringify(apple))) {
-        apple = [Math.floor(Math.random() * 20) * 20, Math.floor(Math.random() * 20) * 20];
+        apple = [Math.floor(Math.random() * 18) * 18, Math.floor(Math.random() * 18) * 18];
     }
     paintAppleBlock(apple[0], apple[1]);
 }
@@ -112,7 +112,7 @@ function moveSnake() {
         if (JSON.stringify(apple) == JSON.stringify(snake[0])) {
             apple = [];
             putApple();
-            snakeInterval *= snakeAccel;
+            snakeInterval = Math.max(snakeInterval * snakeAccel, 100);
         } else {
             removeSnakeTail();
         }
