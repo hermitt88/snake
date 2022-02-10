@@ -47,7 +47,6 @@ function moveSnake() {
     headY = snake[0][1];
     if (directionTemp.length != 0) {
         let newDirection = directionTemp.shift();
-        console.log(newDirection);
         if (direction == "right" && newDirection != "left" && newDirection != "right") {direction = newDirection}
         if (direction == "down" && newDirection != "up" && newDirection != "down") {direction = newDirection}
         if (direction == "left" && newDirection != "right" && newDirection != "left") {direction = newDirection}
