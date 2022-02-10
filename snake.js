@@ -1,6 +1,8 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
+document.body.style.overflow = "hidden";
+
 canvas.width = 400; // Multiples of "20"
 canvas.height = 400;
 const canvasW = canvas.width;
@@ -27,6 +29,42 @@ let snakeInterval, snakeAccel;
 let direction, directionTemp;
 let directions = [KEY_RIGHT, KEY_DOWN, KEY_LEFT, KEY_UP]
 setSnakeGame();
+
+let touchstartX, touchstartY, touchendX, touchendY;
+
+canvas.addEventListener('touchstart', function(event) {
+    touchstartX = event.changedTouches[0].screenX;
+    touchstartY = event.changedTouches[0].screenY;
+}, false);
+
+canvas.addEventListener('touchend', function(event) {
+    touchendX = event.changedTouches[0].screenX;
+    touchendY = event.changedTouches[0].screenY;
+    handleGesure();
+}, false); 
+
+function handleGesure() {
+    let lastKey;
+    let swipeX = touchendX - touchstartX;
+    let swipeY = touchendY - touchstartY;
+    if (Math.abs(swipeX) > Math.abs(swipeY)) {
+        if (swipeX > 0) {
+            lastKey = "right";
+        } else {
+            lastKey = "left";
+        }
+    } else {
+        if (swipeY > 0) {
+            lastKey = "down";
+        } else {
+            lastKey = "up";
+        }
+    }
+    if (directionTemp.length == 0 || lastKey != directionTemp[directionTemp.length-1]) {
+        directionTemp = directionTemp.slice(-2).concat(lastKey);
+    }
+}
+
 
 // ctx.strokeStyle = "#964b00";
 // ctx.lineWidth = 5;
