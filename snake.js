@@ -85,7 +85,7 @@ function moveSnake() {
 function setSnakeGame() {
     snake = [[180, 180], [160, 180], [140, 180]];
     snakeInterval = 300;
-    snakeAccel = 0.95;
+    snakeAccel = 0.9;
     direction = "right";
     directionTemp = [];
     for (let block of snake) {
