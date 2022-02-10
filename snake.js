@@ -25,6 +25,7 @@ let apple = [];
 let headX, headY;
 let snakeInterval, snakeAccel;
 let direction, directionTemp;
+let directions = [KEY_RIGHT, KEY_DOWN, KEY_LEFT, KEY_UP]
 setSnakeGame();
 
 // ctx.strokeStyle = "#964b00";
@@ -44,10 +45,14 @@ function snakeGame() {
 function moveSnake() {
     headX = snake[0][0];
     headY = snake[0][1];
-    if (direction == "right" && directionTemp != "left" && directionTemp != "right") {direction = directionTemp}
-    if (direction == "down" && directionTemp != "up" && directionTemp != "down") {direction = directionTemp}
-    if (direction == "left" && directionTemp != "right" && directionTemp != "left") {direction = directionTemp}
-    if (direction == "up" && directionTemp != "down" && directionTemp != "up") {direction = directionTemp}
+    if (directionTemp.length != 0) {
+        let newDirection = directionTemp.shift();
+        console.log(newDirection);
+        if (direction == "right" && newDirection != "left" && newDirection != "right") {direction = newDirection}
+        if (direction == "down" && newDirection != "up" && newDirection != "down") {direction = newDirection}
+        if (direction == "left" && newDirection != "right" && newDirection != "left") {direction = newDirection}
+        if (direction == "up" && newDirection != "down" && newDirection != "up") {direction = newDirection}
+    }
     switch (direction) {
         case "right":
             headX += gap;
@@ -81,9 +86,9 @@ function moveSnake() {
 function setSnakeGame() {
     snake = [[180, 180], [160, 180], [140, 180]];
     snakeInterval = 300;
-    snakeAccel = 0.85;
+    snakeAccel = 0.95;
     direction = "right";
-    directionTemp = "right";
+    directionTemp = [];
     for (let block of snake) {
         headX = block[0];
         headY = block[1];
@@ -134,18 +139,24 @@ function sleep(ms) {
 }
 
 function changeDirection(e) {
-    switch (e.key) {
-        case KEY_RIGHT:
-            directionTemp = "right";
-            break
-        case KEY_DOWN:
-            directionTemp = "down";
-            break
-        case KEY_LEFT:
-            directionTemp = "left";
-            break
-        case KEY_UP:
-            directionTemp = "up";
-            break
+    let lastKey = e.key;
+    if (directions.includes(lastKey)) {
+        switch (lastKey) {
+            case KEY_RIGHT:
+                lastKey = "right";
+                break
+            case KEY_DOWN:
+                lastKey = "down";
+                break
+            case KEY_LEFT:
+                lastKey = "left";
+                break
+            case KEY_UP:
+                lastKey = "up";
+                break
+            }
+        if (directionTemp.length == 0 || lastKey != directionTemp[directionTemp.length-1]) {
+            directionTemp = directionTemp.slice(-2).concat(lastKey);
+        }
     }
 }
