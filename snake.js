@@ -16,13 +16,21 @@ const KEY_DOWN = "ArrowDown"
 const KEY_LEFT = "ArrowLeft"
 const KEY_UP = "ArrowUp"
 
-const gap = 18;
+const pointsX = 20;
+const pointsY = 20;
+const gap = canvas.width / pointsX;
+let snakeLength = 3;
+const writeLength = document.querySelector(".snakeLength");
+let snakeMoved = 0;
+const writeMoved = document.querySelector(".snakeMoved");
+let snakeTurned = 0;
+const writeTurned = document.querySelector(".snakeTurned");
 
 const form = document.querySelector("form");
 
 let timerId
 
-let snake = [[180, 180], [160, 180], [140, 180]];
+let snake = [[10 * gap, 9 * gap], [9 * gap, 9 * gap], [8 * gap, 9 * gap]];
 let apple = [];
 let headX, headY;
 let snakeInterval, snakeAccel;
@@ -71,7 +79,7 @@ function handleGesure() {
 
 function putApple() {
     while (apple.length === 0 || JSON.stringify(snake).includes(JSON.stringify(apple))) {
-        apple = [Math.floor(Math.random() * 18) * 18, Math.floor(Math.random() * 18) * 18];
+        apple = [Math.floor(Math.random() * 20) * gap, Math.floor(Math.random() * 20) * gap];
     }
     paintAppleBlock(apple[0], apple[1]);
 }
@@ -89,6 +97,8 @@ function moveSnake() {
         if (direction == "down" && newDirection != "up" && newDirection != "down") {direction = newDirection}
         if (direction == "left" && newDirection != "right" && newDirection != "left") {direction = newDirection}
         if (direction == "up" && newDirection != "down" && newDirection != "up") {direction = newDirection}
+        snakeTurned += 1;
+        writeTurned.innerText = snakeTurned;
     }
     switch (direction) {
         case "right":
@@ -112,20 +122,30 @@ function moveSnake() {
         if (JSON.stringify(apple) == JSON.stringify(snake[0])) {
             apple = [];
             putApple();
-            snakeInterval = Math.max(snakeInterval * snakeAccel, 100);
+            snakeInterval = Math.max(snakeInterval * snakeAccel, 150);
+            snakeLength += 1;
+            writeLength.innerText = snakeLength;
         } else {
             removeSnakeTail();
         }
+        snakeMoved += 1;
+        writeMoved.innerText = snakeMoved;
         snakeGame();
     }
 }
 
 function setSnakeGame() {
-    snake = [[180, 180], [160, 180], [140, 180]];
+    snake = [[10 * gap, 9 * gap], [9 * gap, 9 * gap], [8 * gap, 9 * gap]];
     snakeInterval = 300;
     snakeAccel = 0.9;
     direction = "right";
     directionTemp = [];
+    snakeLength = 3;
+    writeLength.innerText = snakeLength;
+    snakeMoved = 0;
+    writeMoved.innerText = snakeMoved;
+    snakeTurned = 0;
+    writeTurned.innerText = snakeTurned;
     for (let block of snake) {
         headX = block[0];
         headY = block[1];
