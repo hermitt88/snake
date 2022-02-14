@@ -21,6 +21,8 @@ const pointsY = 20;
 const gap = canvas.width / pointsX;
 let snakeLength = 3;
 const writeLength = document.querySelector(".snakeLength");
+let timerZero;
+const writeTime = document.querySelector(".snakeTime");
 let snakeMoved = 0;
 const writeMoved = document.querySelector(".snakeMoved");
 let snakeTurned = 0;
@@ -28,7 +30,7 @@ const writeTurned = document.querySelector(".snakeTurned");
 
 const form = document.querySelector("form");
 
-let timerId
+let timeoutId, intervalId;
 
 let snake = [[10 * gap, 9 * gap], [9 * gap, 9 * gap], [8 * gap, 9 * gap]];
 let apple = [];
@@ -85,7 +87,7 @@ function putApple() {
 }
 
 function snakeGame() {
-    timerId = setTimeout(moveSnake, snakeInterval);
+    timeoutId = setTimeout(moveSnake, snakeInterval);
 }
 
 function moveSnake() {
@@ -98,7 +100,7 @@ function moveSnake() {
         if (direction == "left" && newDirection != "right" && newDirection != "left") {direction = newDirection}
         if (direction == "up" && newDirection != "down" && newDirection != "up") {direction = newDirection}
         snakeTurned += 1;
-        writeTurned.innerText = snakeTurned;
+        writeTurned.innerText = `Turned: ${snakeTurned}`;
     }
     switch (direction) {
         case "right":
@@ -124,28 +126,35 @@ function moveSnake() {
             putApple();
             snakeInterval = Math.max(snakeInterval * snakeAccel, 150);
             snakeLength += 1;
-            writeLength.innerText = snakeLength;
+            writeLength.innerText = ` Snake Length: ${snakeLength}`;
         } else {
             removeSnakeTail();
         }
         snakeMoved += 1;
-        writeMoved.innerText = snakeMoved;
+        writeMoved.innerText = `Moved: ${snakeMoved}`;
         snakeGame();
     }
 }
 
 function setSnakeGame() {
+    ctx.fillStyle = "#ebc292";
+    ctx.fillRect(0, 0, canvasW, canvasH);
     snake = [[10 * gap, 9 * gap], [9 * gap, 9 * gap], [8 * gap, 9 * gap]];
     snakeInterval = 300;
     snakeAccel = 0.9;
     direction = "right";
     directionTemp = [];
     snakeLength = 3;
-    writeLength.innerText = snakeLength;
+    writeLength.innerText = `Snake Length: ${snakeLength}`;
+    const date = new Date();
+    timerZero = date.getTime();
+    snakeTime = "0s";
+    intervalId = setInterval(timer, 1000);
+    writeTime.innerText = `Survived: ${snakeTime}`;
     snakeMoved = 0;
-    writeMoved.innerText = snakeMoved;
+    writeMoved.innerText = `Moved: ${snakeMoved}`;
     snakeTurned = 0;
-    writeTurned.innerText = snakeTurned;
+    writeTurned.innerText = `Turned: ${snakeTurned}`;
     for (let block of snake) {
         headX = block[0];
         headY = block[1];
@@ -157,11 +166,13 @@ function setSnakeGame() {
 }
 
 function gameOver() {
-    clearTimeout(timerId);
-    ctx.fillStyle = "gray"
+    clearTimeout(timeoutId);
+    clearInterval(intervalId);
     for (let i = 0; i < snake.length; i++) {
-        setTimeout(() => ctx.fillRect(snake[i][0]+1, snake[i][1]+1, gap-2, gap-2), 100*i);
-    }
+        setTimeout(() => {
+            ctx.fillStyle = "#" + (238 + Math.round(i*153/(1-snake.length))).toString(16).repeat(3);
+            ctx.fillRect(snake[i][0]+1, snake[i][1]+1, gap-2, gap-2);}, 100*i);
+        }
 }
 
 function paintSnakeBlock(x, y) {
@@ -170,23 +181,30 @@ function paintSnakeBlock(x, y) {
 }
 
 function paintAppleBlock() {
-    ctx.fillStyle = "Red";
+    ctx.fillStyle = "#ff0800";
     ctx.fillRect(apple[0]+1, apple[1]+1, gap-2, gap-2);
 }
 
 function removeSnakeTail() {
     const snakeTail = snake.pop();
-    ctx.clearRect(snakeTail[0], snakeTail[1], gap, gap);
+    ctx.fillStyle = "#ebc292";
+    ctx.fillRect(snakeTail[0]+1, snakeTail[1]+1, gap-2, gap-2);
 }
 
-function handleClearBtn(e) {
+function handleRetryBtn(e) {
     e.preventDefault();
-    clearTimeout(timerId);
+    clearTimeout(timeoutId);
     ctx.clearRect(0, 0, canvasW, canvasH);
     setSnakeGame();
 }
 
-form.addEventListener("submit", handleClearBtn);
+function timer() {
+    const date = new Date();
+    const seconds = parseInt((date.getTime() - timerZero)/1000);
+    writeTime.innerText = `Survived: ${seconds >= 60 ? `${parseInt(seconds / 60)}m ${seconds % 60}s` : `${seconds % 60}s`}`;
+}
+
+form.addEventListener("submit", handleRetryBtn);
 
 window.addEventListener("keydown", changeDirection);
 
