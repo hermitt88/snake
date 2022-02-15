@@ -121,18 +121,23 @@ function moveSnake() {
     } else {
         paintSnakeBlock(headX, headY);
         snake.unshift([headX, headY]);
+        snakeMoved += 1;
+        writeMoved.innerText = `Moved: ${snakeMoved}`;
         if (JSON.stringify(apple) == JSON.stringify(snake[0])) {
-            apple = [];
-            putApple();
             snakeInterval = Math.max(snakeInterval * snakeAccel, 150);
             snakeLength += 1;
             writeLength.innerText = ` Snake Length: ${snakeLength}`;
+            if (snakeLength >= 100) {
+                gameClear();
+            } else {
+                apple = [];
+                putApple();
+                snakeGame();
+            }
         } else {
             removeSnakeTail();
+            snakeGame();
         }
-        snakeMoved += 1;
-        writeMoved.innerText = `Moved: ${snakeMoved}`;
-        snakeGame();
     }
 }
 
@@ -170,7 +175,17 @@ function gameOver() {
     clearInterval(intervalId);
     for (let i = 0; i < snake.length; i++) {
         setTimeout(() => {
-            ctx.fillStyle = "#" + (238 + Math.round(i*153/(1-snake.length))).toString(16).repeat(3);
+            ctx.fillStyle = "hsl(0, 0%, " + Math.round(100*(1 - i/(snake.length - 1))).toString() + "%)";
+            ctx.fillRect(snake[i][0]+1, snake[i][1]+1, gap-2, gap-2);}, 100*i);
+        }
+}
+
+function gameClear() {
+    clearTimeout(timeoutId);
+    clearInterval(intervalId);
+    for (let i = 0; i < snake.length; i++) {
+        setTimeout(() => {
+            ctx.fillStyle = "hsl(" + Math.round(320*i/(snake.length - 1)).toString() + ", 100%, 50%)";
             ctx.fillRect(snake[i][0]+1, snake[i][1]+1, gap-2, gap-2);}, 100*i);
         }
 }
