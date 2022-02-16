@@ -3,8 +3,10 @@ const ctx = canvas.getContext("2d");
 
 document.body.style.overflow = "hidden";
 
-canvas.width = 360; // Multiples of "20"
-canvas.height = 360;
+// canvas.width = 360;
+// canvas.height = 360;
+canvas.width = Math.min(window.innerWidth, window.innerHeight);
+canvas.height = canvas.width;
 const canvasW = canvas.width;
 const canvasH = canvas.height;
 
@@ -16,9 +18,8 @@ const KEY_DOWN = "ArrowDown"
 const KEY_LEFT = "ArrowLeft"
 const KEY_UP = "ArrowUp"
 
-const pointsX = 20;
-const pointsY = 20;
-const gap = canvas.width / pointsX;
+const pointsPerLine = 20;
+const gap = canvas.width / pointsPerLine;
 let snakeLength = 3;
 const writeLength = document.querySelector(".snakeLength");
 let timerZero;
@@ -32,7 +33,7 @@ const form = document.querySelector("form");
 
 let timeoutId, intervalId;
 
-let snake = [[10 * gap, 9 * gap], [9 * gap, 9 * gap], [8 * gap, 9 * gap]];
+let snake = [[10, 9], [9, 9], [8, 9]];
 let apple = [];
 let headX, headY;
 let snakeInterval, snakeAccel;
@@ -81,7 +82,7 @@ function handleGesure() {
 
 function putApple() {
     while (apple.length === 0 || JSON.stringify(snake).includes(JSON.stringify(apple))) {
-        apple = [Math.floor(Math.random() * 20) * gap, Math.floor(Math.random() * 20) * gap];
+        apple = [Math.floor(Math.random() * pointsPerLine), Math.floor(Math.random() * pointsPerLine)];
     }
     paintAppleBlock(apple[0], apple[1]);
 }
@@ -104,19 +105,19 @@ function moveSnake() {
     }
     switch (direction) {
         case "right":
-            headX += gap;
+            headX += 1;
             break
         case "down":
-            headY += gap;
+            headY += 1;
             break
         case "left":
-            headX -= gap;
+            headX -= 1;
             break
         case "up":
-            headY -= gap;
+            headY -= 1;
             break
     }
-    if (JSON.stringify(snake).includes(JSON.stringify([headX, headY]), 1) || headX<0 || headY<0 || headX>canvasW-gap ||headY>canvasH-gap) {
+    if (JSON.stringify(snake).includes(JSON.stringify([headX, headY]), 1) || headX<0 || headY<0 || headX>pointsPerLine-1 ||headY>pointsPerLine-1) {
         gameOver();
     } else {
         paintSnakeBlock(headX, headY);
@@ -144,7 +145,7 @@ function moveSnake() {
 function setSnakeGame() {
     ctx.fillStyle = "#ebc292";
     ctx.fillRect(0, 0, canvasW, canvasH);
-    snake = [[10 * gap, 9 * gap], [9 * gap, 9 * gap], [8 * gap, 9 * gap]];
+    snake = [[10, 9], [9, 9], [8, 9]];
     snakeInterval = 300;
     snakeAccel = 0.9;
     direction = "right";
@@ -176,7 +177,7 @@ function gameOver() {
     for (let i = 0; i < snake.length; i++) {
         setTimeout(() => {
             ctx.fillStyle = "hsl(0, 0%, " + Math.round(100*(1 - i/(snake.length - 1))).toString() + "%)";
-            ctx.fillRect(snake[i][0]+1, snake[i][1]+1, gap-2, gap-2);}, 100*i);
+            ctx.fillRect((snake[i][0]+0.05)*gap, (snake[i][1]+0.05)*gap, 0.9*gap, 0.9*gap);}, 100*i);
         }
 }
 
@@ -186,24 +187,24 @@ function gameClear() {
     for (let i = 0; i < snake.length; i++) {
         setTimeout(() => {
             ctx.fillStyle = "hsl(" + Math.round(320*i/(snake.length - 1)).toString() + ", 100%, 50%)";
-            ctx.fillRect(snake[i][0]+1, snake[i][1]+1, gap-2, gap-2);}, 100*i);
+            ctx.fillRect((snake[i][0]+0.05)*gap, (snake[i][1]+0.05)*gap, 0.9*gap, 0.9*gap);}, 100*i);
         }
 }
 
 function paintSnakeBlock(x, y) {
     ctx.fillStyle = "green";
-    ctx.fillRect(x+1, y+1, gap-2, gap-2);
+    ctx.fillRect((x+0.05)*gap, (y+0.05)*gap, 0.9*gap, 0.9*gap);
 }
 
 function paintAppleBlock() {
     ctx.fillStyle = "#ff0800";
-    ctx.fillRect(apple[0]+1, apple[1]+1, gap-2, gap-2);
+    ctx.fillRect((apple[0]+0.05)*gap, (apple[1]+0.05)*gap, 0.9*gap, 0.9*gap);
 }
 
 function removeSnakeTail() {
     const snakeTail = snake.pop();
     ctx.fillStyle = "#ebc292";
-    ctx.fillRect(snakeTail[0]+1, snakeTail[1]+1, gap-2, gap-2);
+    ctx.fillRect((snakeTail[0])*gap, (snakeTail[1])*gap, gap, gap);
 }
 
 function handleRetryBtn(e) {
