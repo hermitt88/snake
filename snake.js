@@ -32,9 +32,13 @@ let timeoutId, intervalId;
 let snake, apple;
 let headX, headY;
 let snakeInterval, snakeAccel;
+let lengthGoal;
 const intervalForm = document.querySelector(".intervalForm");
 intervalForm.addEventListener("submit", function (e) {e.preventDefault()});
 const setSnakeInterval = document.querySelector(".setSnakeInterval");
+const goalForm = document.querySelector(".goalForm");
+goalForm.addEventListener("submit", function (e) {e.preventDefault()});
+const setLengthGoal = document.querySelector(".setLengthGoal");
 let direction, directionTemp;
 let directions = [KEY_RIGHT, KEY_DOWN, KEY_LEFT, KEY_UP]
 setSnakeGame();
@@ -121,7 +125,7 @@ function moveSnake() {
         if (JSON.stringify(apple) == JSON.stringify(snake[0])) {
             snakeLength += 1;
             writeLength.innerText = ` Snake Length: ${snakeLength}`;
-            if (snakeLength >= 100) {
+            if (snakeLength == lengthGoal) {
                 gameClear();
             } else {
                 apple = [];
@@ -147,6 +151,9 @@ function setSnakeGame() {
     if (setSnakeInterval.value) {
         snakeInterval = parseInt(setSnakeInterval.value);
     } else {snakeInterval = 200;};
+    if (setLengthGoal.value) {
+        lengthGoal = parseInt(setLengthGoal.value);
+    } else {lengthGoal = 50;};
     direction = "right";
     directionTemp = [];
     snakeLength = 3;
