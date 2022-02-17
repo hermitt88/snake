@@ -9,11 +9,14 @@
 </head>
 <body>
     <canvas id="gameCanvas"></canvas>
-    <form class="clearCanvas">
-        <div><span class = snakeLength></span></div>
-        <div><span class = snakeTime></span></div>
-        <div><span class = snakeMoved></span></div>
-        <div><span class = snakeTurned></span></div>
+    <div><span class = snakeLength></span></div>
+    <div><span class = snakeTime></span></div>
+    <div><span class = snakeMoved></span></div>
+    <div><span class = snakeTurned></span></div>
+    <form class="intervalForm">
+        Snake Speed: <input class="setSnakeInterval" type="text" placeholder = "Default is 200">
+    </form>
+    <form class="retryForm">
         <button>Retry</button>
     </form>
     <script src="snake.js"></script>

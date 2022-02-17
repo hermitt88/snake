@@ -26,13 +26,15 @@ const writeTime = document.querySelector(".snakeTime");
 const writeMoved = document.querySelector(".snakeMoved");
 const writeTurned = document.querySelector(".snakeTurned");
 
-const form = document.querySelector("form");
+const retryForm = document.querySelector(".retryForm");
 
 let timeoutId, intervalId;
-
 let snake, apple;
 let headX, headY;
 let snakeInterval, snakeAccel;
+const intervalForm = document.querySelector(".intervalForm");
+intervalForm.addEventListener("submit", function (e) {e.preventDefault()});
+const setSnakeInterval = document.querySelector(".setSnakeInterval");
 let direction, directionTemp;
 let directions = [KEY_RIGHT, KEY_DOWN, KEY_LEFT, KEY_UP]
 setSnakeGame();
@@ -142,7 +144,9 @@ function setSnakeGame() {
     ctx.fillRect(0, 0, gameboardW, gameboardH);
 
     snake = [[10, 9], [9, 9], [8, 9]];
-    snakeInterval = 150;
+    if (setSnakeInterval.value) {
+        snakeInterval = parseInt(setSnakeInterval.value);
+    } else {snakeInterval = 200;};
     direction = "right";
     directionTemp = [];
     snakeLength = 3;
@@ -215,7 +219,7 @@ function timer() {
     writeTime.innerText = `Survived: ${seconds >= 60 ? `${parseInt(seconds / 60)}m ${seconds % 60}s` : `${seconds % 60}s`}`;
 }
 
-form.addEventListener("submit", handleRetryBtn);
+retryForm.addEventListener("submit", handleRetryBtn);
 
 window.addEventListener("keydown", changeDirection);
 
