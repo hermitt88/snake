@@ -3,15 +3,10 @@ const ctx = canvas.getContext("2d");
 
 document.body.style.overflow = "hidden";
 
-// canvas.width = 360;
-// canvas.height = 360;
-canvas.width = Math.min(window.innerWidth, window.innerHeight);
+canvas.width = Math.min(window.innerWidth, window.innerHeight, 550);
 canvas.height = canvas.width;
 const canvasW = canvas.width;
 const canvasH = canvas.height;
-
-// ctx.translate(x, y); 원점 이동
-// save() restore()
 
 const KEY_RIGHT = "ArrowRight"
 const KEY_DOWN = "ArrowDown"
@@ -19,22 +14,23 @@ const KEY_LEFT = "ArrowLeft"
 const KEY_UP = "ArrowUp"
 
 const pointsPerLine = 20;
-const gap = canvas.width / pointsPerLine;
-let snakeLength = 3;
+const gap = parseInt(canvas.width / (pointsPerLine + 2));
+
+const gameboardW = gap * pointsPerLine;
+const gameboardH = gap * pointsPerLine;
+
+
+let snakeLength, timerZero, snakeMoved, snakeTurned;
 const writeLength = document.querySelector(".snakeLength");
-let timerZero;
 const writeTime = document.querySelector(".snakeTime");
-let snakeMoved = 0;
 const writeMoved = document.querySelector(".snakeMoved");
-let snakeTurned = 0;
 const writeTurned = document.querySelector(".snakeTurned");
 
 const form = document.querySelector("form");
 
 let timeoutId, intervalId;
 
-let snake = [[10, 9], [9, 9], [8, 9]];
-let apple = [];
+let snake, apple;
 let headX, headY;
 let snakeInterval, snakeAccel;
 let direction, directionTemp;
@@ -75,10 +71,6 @@ function handleGesure() {
         directionTemp = directionTemp.slice(-2).concat(lastKey);
     }
 }
-
-
-// ctx.strokeStyle = "#964b00";
-// ctx.lineWidth = 5;
 
 function putApple() {
     while (apple.length === 0 || JSON.stringify(snake).includes(JSON.stringify(apple))) {
@@ -125,7 +117,6 @@ function moveSnake() {
         snakeMoved += 1;
         writeMoved.innerText = `Moved: ${snakeMoved}`;
         if (JSON.stringify(apple) == JSON.stringify(snake[0])) {
-            snakeInterval = Math.max(snakeInterval * snakeAccel, 150);
             snakeLength += 1;
             writeLength.innerText = ` Snake Length: ${snakeLength}`;
             if (snakeLength >= 100) {
@@ -143,11 +134,15 @@ function moveSnake() {
 }
 
 function setSnakeGame() {
-    ctx.fillStyle = "#ebc292";
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.fillStyle = "#964b00";
     ctx.fillRect(0, 0, canvasW, canvasH);
+    ctx.translate(0.5*(canvasW - gameboardW), 0.5*(canvasH - gameboardH));
+    ctx.fillStyle = "#ebc292";
+    ctx.fillRect(0, 0, gameboardW, gameboardH);
+
     snake = [[10, 9], [9, 9], [8, 9]];
-    snakeInterval = 300;
-    snakeAccel = 0.9;
+    snakeInterval = 150;
     direction = "right";
     directionTemp = [];
     snakeLength = 3;
@@ -177,7 +172,7 @@ function gameOver() {
     for (let i = 0; i < snake.length; i++) {
         setTimeout(() => {
             ctx.fillStyle = "hsl(0, 0%, " + Math.round(100*(1 - i/(snake.length - 1))).toString() + "%)";
-            ctx.fillRect((snake[i][0]+0.05)*gap, (snake[i][1]+0.05)*gap, 0.9*gap, 0.9*gap);}, 100*i);
+            ctx.fillRect(Math.round((0.075+snake[i][0])*gap), Math.round((0.075+snake[i][1])*gap), Math.round(0.85*gap), Math.round(0.85*gap));}, 100*i);
         }
 }
 
@@ -187,30 +182,30 @@ function gameClear() {
     for (let i = 0; i < snake.length; i++) {
         setTimeout(() => {
             ctx.fillStyle = "hsl(" + Math.round(320*i/(snake.length - 1)).toString() + ", 100%, 50%)";
-            ctx.fillRect((snake[i][0]+0.05)*gap, (snake[i][1]+0.05)*gap, 0.9*gap, 0.9*gap);}, 100*i);
+            ctx.fillRect(Math.round((0.075+snake[i][0])*gap), Math.round((0.075+snake[i][1])*gap), Math.round(0.85*gap), Math.round(0.85*gap));}, 100*i);
         }
 }
 
 function paintSnakeBlock(x, y) {
     ctx.fillStyle = "green";
-    ctx.fillRect((x+0.05)*gap, (y+0.05)*gap, 0.9*gap, 0.9*gap);
+    ctx.fillRect(Math.round((0.075+x)*gap), Math.round((0.075+y)*gap), Math.round(0.85*gap), Math.round(0.85*gap));
 }
 
 function paintAppleBlock() {
     ctx.fillStyle = "#ff0800";
-    ctx.fillRect((apple[0]+0.05)*gap, (apple[1]+0.05)*gap, 0.9*gap, 0.9*gap);
+    ctx.fillRect(Math.round((0.075+apple[0])*gap), Math.round((0.075+apple[1])*gap), Math.round(0.85*gap), Math.round(0.85*gap));
 }
 
 function removeSnakeTail() {
     const snakeTail = snake.pop();
     ctx.fillStyle = "#ebc292";
-    ctx.fillRect((snakeTail[0])*gap, (snakeTail[1])*gap, gap, gap);
+    ctx.fillRect(Math.round((0.075+snakeTail[0])*gap), Math.round((0.075+snakeTail[1])*gap), Math.round(0.85*gap), Math.round(0.85*gap));
 }
 
 function handleRetryBtn(e) {
     e.preventDefault();
     clearTimeout(timeoutId);
-    ctx.clearRect(0, 0, canvasW, canvasH);
+    ctx.clearRect(0, 0, gameboardW, gameboardH);
     setSnakeGame();
 }
 
@@ -223,11 +218,6 @@ function timer() {
 form.addEventListener("submit", handleRetryBtn);
 
 window.addEventListener("keydown", changeDirection);
-
-function sleep(ms) {
-    const wakeUpTime = Date.now() + ms;
-    while (Date.now() < wakeUpTime) {}
-}
 
 function changeDirection(e) {
     let lastKey = e.key;
