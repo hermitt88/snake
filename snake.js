@@ -14,7 +14,7 @@ const KEY_LEFT = "ArrowLeft"
 const KEY_UP = "ArrowUp"
 
 const pointsPerLine = 20;
-const gap = parseInt(canvas.width / (pointsPerLine + 2));
+const gap = Math.ceil(canvas.width / (pointsPerLine + 2));
 
 const gameboardW = gap * pointsPerLine;
 const gameboardH = gap * pointsPerLine;
@@ -150,10 +150,10 @@ function setSnakeGame() {
     snake = [[10, 9], [9, 9], [8, 9]];
     if (setSnakeInterval.value) {
         snakeInterval = parseInt(setSnakeInterval.value);
-    } else {snakeInterval = 200;};
+    } else {snakeInterval = 150;};
     if (setLengthGoal.value) {
         lengthGoal = parseInt(setLengthGoal.value);
-    } else {lengthGoal = 50;};
+    } else {lengthGoal = 30;};
     direction = "right";
     directionTemp = [];
     snakeLength = 3;
