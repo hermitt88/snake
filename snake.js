@@ -13,6 +13,9 @@ const KEY_DOWN = "ArrowDown"
 const KEY_LEFT = "ArrowLeft"
 const KEY_UP = "ArrowUp"
 
+const boardColor1 = "hsl(44, 40%, 88%)";
+const boardColor2 = "hsl(44, 40%, 80%)";
+
 const pointsPerLine = 20;
 const gap = Math.ceil(canvas.width / (pointsPerLine + 2));
 
@@ -158,8 +161,16 @@ function setSnakeGame() {
     ctx.fillStyle = "#964b00";
     ctx.fillRect(0, 0, canvasW, canvasH);
     ctx.translate(0.5*(canvasW - gameboardW), 0.5*(canvasH - gameboardH));
-    ctx.fillStyle = "#ebc292";
-    ctx.fillRect(0, 0, gameboardW, gameboardH);
+    for (let i=0; i<pointsPerLine; i++) {
+        for (let j=0; j<pointsPerLine; j++) {
+            if ((i+j) % 2 == 0) {
+                ctx.fillStyle = boardColor1;
+            } else {
+                ctx.fillStyle = boardColor2;
+            };
+            ctx.fillRect(i*gap, j*gap, gap, gap);
+        }
+    };
 
     snake = [[10, 9], [9, 9], [8, 9]];
     if (setSnakeInterval.value) {
@@ -223,8 +234,12 @@ function paintAppleBlock() {
 
 function removeSnakeTail() {
     const snakeTail = snake.pop();
-    ctx.fillStyle = "#ebc292";
-    ctx.fillRect(Math.round((0.075+snakeTail[0])*gap), Math.round((0.075+snakeTail[1])*gap), Math.round(0.85*gap), Math.round(0.85*gap));
+    if ((snakeTail[0]+snakeTail[1]) % 2 == 0) {
+        ctx.fillStyle = boardColor1;
+    } else {
+        ctx.fillStyle = boardColor2;
+    };
+    ctx.fillRect(snakeTail[0]*gap, snakeTail[1]*gap, gap, gap);
 }
 
 function handleRetryBtn(e) {
