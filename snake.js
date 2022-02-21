@@ -94,12 +94,26 @@ function moveSnake() {
     headY = snake[0][1];
     if (directionTemp.length != 0) {
         let newDirection = directionTemp.shift();
-        if (direction == "right" && newDirection != "left" && newDirection != "right") {direction = newDirection}
-        if (direction == "down" && newDirection != "up" && newDirection != "down") {direction = newDirection}
-        if (direction == "left" && newDirection != "right" && newDirection != "left") {direction = newDirection}
-        if (direction == "up" && newDirection != "down" && newDirection != "up") {direction = newDirection}
-        snakeTurned += 1;
-        writeTurned.innerText = `Turned: ${snakeTurned}`;
+        if (direction == "right" && newDirection != "left" && newDirection != "right") {
+            direction = newDirection;
+            snakeTurned += 1;
+            writeTurned.innerText = `Turned: ${snakeTurned}`;
+        }
+        if (direction == "down" && newDirection != "up" && newDirection != "down") {
+            direction = newDirection;
+            snakeTurned += 1;
+            writeTurned.innerText = `Turned: ${snakeTurned}`;
+        }
+        if (direction == "left" && newDirection != "right" && newDirection != "left") {
+            direction = newDirection;
+            snakeTurned += 1;
+            writeTurned.innerText = `Turned: ${snakeTurned}`;
+        }
+        if (direction == "up" && newDirection != "down" && newDirection != "up") {
+            direction = newDirection;
+            snakeTurned += 1;
+            writeTurned.innerText = `Turned: ${snakeTurned}`;
+        }
     }
     switch (direction) {
         case "right":
