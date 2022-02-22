@@ -34,7 +34,7 @@ const retryForm = document.querySelector(".retryForm");
 let timeoutId, intervalId;
 let snake, apple;
 let headX, headY;
-let snakeInterval, snakeAccel;
+let snakeInterval, snakeAccel, snakeMaximum;
 let lengthGoal;
 const intervalForm = document.querySelector(".intervalForm");
 intervalForm.addEventListener("submit", function (e) {e.preventDefault()});
@@ -145,6 +145,7 @@ function moveSnake() {
             if (snakeLength == lengthGoal) {
                 gameClear();
             } else {
+                snakeInterval = Math.max(snakeInterval*snakeAccel, snakeMaximum);
                 apple = [];
                 putApple();
                 snakeGame();
@@ -175,7 +176,9 @@ function setSnakeGame() {
     snake = [[10, 9], [9, 9], [8, 9]];
     if (setSnakeInterval.value) {
         snakeInterval = parseInt(setSnakeInterval.value);
-    } else {snakeInterval = 150;};
+    } else {snakeInterval = 200;};
+    snakeAccel = 0.97;
+    snakeMaximum = snakeInterval*0.5;
     if (setLengthGoal.value) {
         lengthGoal = parseInt(setLengthGoal.value);
     } else {lengthGoal = 30;};
@@ -199,6 +202,9 @@ function setSnakeGame() {
     }
     apple = [];
     putApple();
+    intervalForm.hidden = true;
+    goalForm.hidden = true;
+    retryForm.hidden = true;
     snakeGame();
 }
 
@@ -209,7 +215,10 @@ function gameOver() {
         setTimeout(() => {
             ctx.fillStyle = "hsl(0, 0%, " + Math.round(100*(1 - i/(snake.length - 1))).toString() + "%)";
             ctx.fillRect(Math.round((0.075+snake[i][0])*gap), Math.round((0.075+snake[i][1])*gap), Math.round(0.85*gap), Math.round(0.85*gap));}, 100*i);
-        }
+        };
+    intervalForm.hidden = false;
+    goalForm.hidden = false;
+    retryForm.hidden = false;
 }
 
 function gameClear() {
@@ -219,7 +228,10 @@ function gameClear() {
         setTimeout(() => {
             ctx.fillStyle = "hsl(" + Math.round(320*i/(snake.length - 1)).toString() + ", 100%, 50%)";
             ctx.fillRect(Math.round((0.075+snake[i][0])*gap), Math.round((0.075+snake[i][1])*gap), Math.round(0.85*gap), Math.round(0.85*gap));}, 100*i);
-        }
+        };
+    intervalForm.hidden = false;
+    goalForm.hidden = false;
+    retryForm.hidden = false;
 }
 
 function paintSnakeBlock(x, y) {
