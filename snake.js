@@ -15,8 +15,10 @@ const KEY_UP = "ArrowUp"
 
 const boardColor1 = "hsl(44, 40%, 88%)";
 const boardColor2 = "hsl(44, 40%, 80%)";
+const snakeColor = "green";
+const appleColor = "#ff0800";
 
-const pointsPerLine = 20;
+const pointsPerLine = 19;
 const gap = Math.ceil(canvas.width / (pointsPerLine + 2));
 
 const gameboardW = gap * pointsPerLine;
@@ -36,12 +38,16 @@ let snake, apple;
 let headX, headY;
 let snakeInterval, snakeAccel, snakeMaximum;
 let lengthGoal;
+const setSnakeInterval = document.querySelector(".setSnakeInterval");
 const intervalForm = document.querySelector(".intervalForm");
 intervalForm.addEventListener("submit", function (e) {e.preventDefault()});
-const setSnakeInterval = document.querySelector(".setSnakeInterval");
 const goalForm = document.querySelector(".goalForm");
 goalForm.addEventListener("submit", function (e) {e.preventDefault()});
+const appleForm = document.querySelector(".appleForm");
+appleForm.addEventListener("submit", function (e) {e.preventDefault()});
 const setLengthGoal = document.querySelector(".setLengthGoal");
+const setApple = document.querySelector(".setApple");
+let applesInGame;
 let direction, directionTemp;
 let directions = [KEY_RIGHT, KEY_DOWN, KEY_LEFT, KEY_UP]
 setSnakeGame();
@@ -82,42 +88,39 @@ function handleGesure() {
 }
 
 function putApple() {
-    while (apple.length === 0 || JSON.stringify(snake).includes(JSON.stringify(apple))) {
-        apple = [Math.floor(Math.random() * pointsPerLine), Math.floor(Math.random() * pointsPerLine)];
+    while (apple.length < applesInGame){
+        pickApple = [Math.floor(Math.random() * pointsPerLine), Math.floor(Math.random() * pointsPerLine)];
+        while (JSON.stringify([...snake, ...apple]).includes(JSON.stringify(pickApple))) {
+            pickApple = [Math.floor(Math.random() * pointsPerLine), Math.floor(Math.random() * pointsPerLine)];
+        };
+        paintBlock(pickApple[0], pickApple[1], appleColor);
+        apple.push(pickApple);
+        pickApple = [];
     }
-    paintAppleBlock(apple[0], apple[1]);
 }
 
 function snakeGame() {
     timeoutId = setTimeout(moveSnake, snakeInterval);
 }
 
-function moveSnake() {
-    headX = snake[0][0];
-    headY = snake[0][1];
+function determineDirection () {
     if (directionTemp.length != 0) {
         let newDirection = directionTemp.shift();
-        if (direction == "right" && newDirection != "left" && newDirection != "right") {
-            direction = newDirection;
-            snakeTurned += 1;
-            writeTurned.innerText = `Turned: ${snakeTurned}`;
-        }
-        if (direction == "down" && newDirection != "up" && newDirection != "down") {
-            direction = newDirection;
-            snakeTurned += 1;
-            writeTurned.innerText = `Turned: ${snakeTurned}`;
-        }
-        if (direction == "left" && newDirection != "right" && newDirection != "left") {
-            direction = newDirection;
-            snakeTurned += 1;
-            writeTurned.innerText = `Turned: ${snakeTurned}`;
-        }
-        if (direction == "up" && newDirection != "down" && newDirection != "up") {
+        if ((direction == "right" && newDirection != "left" && newDirection != "right") 
+        || (direction == "down" && newDirection != "up" && newDirection != "down") 
+        || (direction == "left" && newDirection != "right" && newDirection != "left") 
+        || (direction == "up" && newDirection != "down" && newDirection != "up")) {
             direction = newDirection;
             snakeTurned += 1;
             writeTurned.innerText = `Turned: ${snakeTurned}`;
         }
     }
+}
+
+function moveSnake() {
+    determineDirection();
+    headX = snake[0][0];
+    headY = snake[0][1];
     switch (direction) {
         case "right":
             headX += 1;
@@ -135,18 +138,23 @@ function moveSnake() {
     if (JSON.stringify(snake).includes(JSON.stringify([headX, headY]), 1) || headX<0 || headY<0 || headX>pointsPerLine-1 ||headY>pointsPerLine-1) {
         gameOver();
     } else {
-        paintSnakeBlock(headX, headY);
+        paintBlock(headX, headY, snakeColor);
         snake.unshift([headX, headY]);
         snakeMoved += 1;
         writeMoved.innerText = `Moved: ${snakeMoved}`;
-        if (JSON.stringify(apple) == JSON.stringify(snake[0])) {
+        if (JSON.stringify(apple).includes(JSON.stringify(snake[0]))) {
             snakeLength += 1;
             writeLength.innerText = ` Snake Length: ${snakeLength}`;
             if (snakeLength == lengthGoal) {
                 gameClear();
             } else {
+                for (let i = 0; i < apple.length; i++) {
+                    if (JSON.stringify(apple[i]) == JSON.stringify(snake[0])) {
+                        apple.splice(i, 1);
+                        break
+                    }
+                };
                 snakeInterval = Math.max(snakeInterval*snakeAccel, snakeMaximum);
-                apple = [];
                 putApple();
                 snakeGame();
             }
@@ -161,7 +169,7 @@ function setSnakeGame() {
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.fillStyle = "#964b00";
     ctx.fillRect(0, 0, canvasW, canvasH);
-    ctx.translate(0.5*(canvasW - gameboardW), 0.5*(canvasH - gameboardH));
+    ctx.translate(Math.floor(0.5*(canvasW - gameboardW)), Math.floor(0.5*(canvasH - gameboardH)));
     for (let i=0; i<pointsPerLine; i++) {
         for (let j=0; j<pointsPerLine; j++) {
             if ((i+j) % 2 == 0) {
@@ -198,12 +206,18 @@ function setSnakeGame() {
     for (let block of snake) {
         headX = block[0];
         headY = block[1];
-        paintSnakeBlock(headX, headY);
+        paintBlock(headX, headY, snakeColor);
+    };
+    if (setApple.value) {
+        applesInGame = parseInt(setApple.value);
+    } else {
+        applesInGame = 3;
     }
     apple = [];
     putApple();
     intervalForm.hidden = true;
     goalForm.hidden = true;
+    appleForm.hidden = true;
     retryForm.hidden = true;
     snakeGame();
 }
@@ -218,6 +232,7 @@ function gameOver() {
         };
     intervalForm.hidden = false;
     goalForm.hidden = false;
+    appleForm.hidden = false;
     retryForm.hidden = false;
 }
 
@@ -231,18 +246,15 @@ function gameClear() {
         };
     intervalForm.hidden = false;
     goalForm.hidden = false;
+    appleForm.hidden = false;
     retryForm.hidden = false;
 }
 
-function paintSnakeBlock(x, y) {
-    ctx.fillStyle = "green";
+function paintBlock(x, y, color) {
+    ctx.fillStyle = color;
     ctx.fillRect(Math.round((0.075+x)*gap), Math.round((0.075+y)*gap), Math.round(0.85*gap), Math.round(0.85*gap));
 }
 
-function paintAppleBlock() {
-    ctx.fillStyle = "#ff0800";
-    ctx.fillRect(Math.round((0.075+apple[0])*gap), Math.round((0.075+apple[1])*gap), Math.round(0.85*gap), Math.round(0.85*gap));
-}
 
 function removeSnakeTail() {
     const snakeTail = snake.pop();
