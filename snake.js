@@ -18,11 +18,9 @@ const boardColor2 = "hsl(44, 40%, 80%)";
 const snakeColor = "green";
 const appleColor = "#ff0800";
 
-const pointsPerLine = 19;
-const gap = Math.ceil(canvas.width / (pointsPerLine + 2));
-
-const gameboardW = gap * pointsPerLine;
-const gameboardH = gap * pointsPerLine;
+let pointsPerLine;
+let gap;
+let gameboardW, gameboardH;
 
 
 let snakeLength, timerZero, snakeMoved, snakeTurned;
@@ -45,6 +43,9 @@ const goalForm = document.querySelector(".goalForm");
 goalForm.addEventListener("submit", function (e) {e.preventDefault()});
 const appleForm = document.querySelector(".appleForm");
 appleForm.addEventListener("submit", function (e) {e.preventDefault()});
+const mapsizeForm = document.querySelector(".mapsizeForm");
+mapsizeForm.addEventListener("submit", function (e) {e.preventDefault()});
+const setMapsize = document.querySelector(".setMapsize");
 const setLengthGoal = document.querySelector(".setLengthGoal");
 const setApple = document.querySelector(".setApple");
 let applesInGame;
@@ -166,6 +167,14 @@ function moveSnake() {
 }
 
 function setSnakeGame() {
+    if(setMapsize.value) {
+        pointsPerLine = Math.max(parseInt(setMapsize.value), 11);
+    } else {
+        pointsPerLine = 19;
+    };
+    gap = Math.ceil(canvas.width / (pointsPerLine + 2));
+    gameboardW = gap * pointsPerLine;
+    gameboardH = gap * pointsPerLine;
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.fillStyle = "#964b00";
     ctx.fillRect(0, 0, canvasW, canvasH);
@@ -180,15 +189,15 @@ function setSnakeGame() {
             ctx.fillRect(i*gap, j*gap, gap, gap);
         }
     };
-
-    snake = [[10, 9], [9, 9], [8, 9]];
+    let startingPos = Math.floor(pointsPerLine / 3);
+    snake = [[startingPos, startingPos], [startingPos-1, startingPos], [startingPos-2, startingPos]];
     if (setSnakeInterval.value) {
         snakeInterval = parseInt(setSnakeInterval.value);
     } else {snakeInterval = 200;};
     snakeAccel = 0.97;
     snakeMaximum = snakeInterval*0.5;
     if (setLengthGoal.value) {
-        lengthGoal = parseInt(setLengthGoal.value);
+        lengthGoal = Math.max(parseInt(setLengthGoal.value), pointsPerLine*pointsPerLine);
     } else {lengthGoal = 30;};
     direction = "right";
     directionTemp = [];
@@ -218,6 +227,7 @@ function setSnakeGame() {
     intervalForm.hidden = true;
     goalForm.hidden = true;
     appleForm.hidden = true;
+    mapsizeForm.hidden = true;
     retryForm.hidden = true;
     snakeGame();
 }
@@ -233,6 +243,7 @@ function gameOver() {
     intervalForm.hidden = false;
     goalForm.hidden = false;
     appleForm.hidden = false;
+    mapsizeForm.hidden = false;
     retryForm.hidden = false;
 }
 
@@ -247,6 +258,7 @@ function gameClear() {
     intervalForm.hidden = false;
     goalForm.hidden = false;
     appleForm.hidden = false;
+    mapsizeForm.hidden = false;
     retryForm.hidden = false;
 }
 
