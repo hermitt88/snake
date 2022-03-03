@@ -1,12 +1,18 @@
-const canvas = document.getElementById("gameCanvas");
-const ctx = canvas.getContext("2d");
+const gameCanvas = document.getElementById("gameCanvas");
+const ctxGame = gameCanvas.getContext("2d");
+const bgCanvas = document.getElementById("bgCanvas");
+const ctxBg = bgCanvas.getContext("2d");
 
 document.body.style.overflow = "hidden";
 
-canvas.width = Math.min(window.innerWidth, window.innerHeight, 550);
-canvas.height = canvas.width;
-const canvasW = canvas.width;
-const canvasH = canvas.height;
+gameCanvas.width = Math.min(window.innerWidth, window.innerHeight, 550);
+gameCanvas.height = gameCanvas.width;
+const gameCanvasW = gameCanvas.width;
+const gameCanvasH = gameCanvas.height;
+bgCanvas.width = gameCanvas.width;
+bgCanvas.height = gameCanvas.width;
+const bgCanvasW = bgCanvas.width;
+const bgCanvasH = bgCanvas.height;
 
 const KEY_RIGHT = "ArrowRight"
 const KEY_DOWN = "ArrowDown"
@@ -18,10 +24,11 @@ const boardColor2 = "hsl(44, 40%, 80%)";
 const snakeColor = "green";
 const appleColor = "#ff0800";
 
-let pointsPerLine;
-let gap;
-let gameboardW, gameboardH;
-
+let pointsPerLine = 19;
+let gap = Math.ceil(gameCanvas.width / (pointsPerLine + 2));
+let gameboardW = gap * pointsPerLine;
+let gameboardH = gap * pointsPerLine;
+paintBgCanvas();
 
 let snakeLength, timerZero, snakeMoved, snakeTurned;
 const writeLength = document.querySelector(".snakeLength");
@@ -166,29 +173,39 @@ function moveSnake() {
     }
 }
 
+function paintBgCanvas() {
+    ctxBg.setTransform(1, 0, 0, 1, 0, 0);
+    ctxBg.clearRect(0, 0, gameCanvasW, gameCanvasH);
+    ctxBg.fillStyle = "#964b00";
+    ctxBg.fillRect(0, 0, gameCanvasW, gameCanvasH);
+    ctxBg.translate(Math.floor(0.5*(gameCanvasW - gameboardW)), Math.floor(0.5*(gameCanvasH - gameboardH)));
+    for (let i=0; i<pointsPerLine; i++) {
+        for (let j=0; j<pointsPerLine; j++) {
+            if ((i+j) % 2 == 0) {
+                ctxBg.fillStyle = boardColor1;
+            } else {
+                ctxBg.fillStyle = boardColor2;
+            };
+            ctxBg.fillRect(i*gap, j*gap, gap, gap);
+        }
+    };
+}
+
 function setSnakeGame() {
     if(setMapsize.value) {
         pointsPerLine = Math.max(parseInt(setMapsize.value), 11);
     } else {
         pointsPerLine = 19;
     };
-    gap = Math.ceil(canvas.width / (pointsPerLine + 2));
+    gap = Math.ceil(gameCanvas.width / (pointsPerLine + 2));
     gameboardW = gap * pointsPerLine;
     gameboardH = gap * pointsPerLine;
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.fillStyle = "#964b00";
-    ctx.fillRect(0, 0, canvasW, canvasH);
-    ctx.translate(Math.floor(0.5*(canvasW - gameboardW)), Math.floor(0.5*(canvasH - gameboardH)));
-    for (let i=0; i<pointsPerLine; i++) {
-        for (let j=0; j<pointsPerLine; j++) {
-            if ((i+j) % 2 == 0) {
-                ctx.fillStyle = boardColor1;
-            } else {
-                ctx.fillStyle = boardColor2;
-            };
-            ctx.fillRect(i*gap, j*gap, gap, gap);
-        }
-    };
+    paintBgCanvas();
+    ctxGame.setTransform(1, 0, 0, 1, 0, 0);
+    ctxGame.fillStyle = "#964b00";
+    ctxGame.clearRect(0, 0, gameCanvasW, gameCanvasH);
+    ctxGame.translate(Math.floor(0.5*(gameCanvasW - gameboardW)), Math.floor(0.5*(gameCanvasH - gameboardH)));
+
     let startingPos = Math.floor(pointsPerLine / 3);
     snake = [[startingPos, startingPos], [startingPos-1, startingPos], [startingPos-2, startingPos]];
     if (setSnakeInterval.value) {
@@ -237,8 +254,11 @@ function gameOver() {
     clearInterval(intervalId);
     for (let i = 0; i < snake.length; i++) {
         setTimeout(() => {
-            ctx.fillStyle = "hsl(0, 0%, " + Math.round(100*(1 - i/(snake.length - 1))).toString() + "%)";
-            ctx.fillRect(Math.round((0.075+snake[i][0])*gap), Math.round((0.075+snake[i][1])*gap), Math.round(0.85*gap), Math.round(0.85*gap));}, 100*i);
+            ctxGame.fillStyle = "hsl(0, 0%, " + Math.round(100*(1 - i/(snake.length - 1))).toString() + "%)";
+            const pad = Math.round(0.075*gap);
+            const padX = pad +snake[i][0]*gap;
+            const padY = pad +snake[i][1]*gap;
+            ctxGame.fillRect(padX, padY, gap-2*pad, gap-2*pad);}, 100*i);
         };
     intervalForm.hidden = false;
     goalForm.hidden = false;
@@ -252,8 +272,11 @@ function gameClear() {
     clearInterval(intervalId);
     for (let i = 0; i < snake.length; i++) {
         setTimeout(() => {
-            ctx.fillStyle = "hsl(" + Math.round(320*i/(snake.length - 1)).toString() + ", 100%, 50%)";
-            ctx.fillRect(Math.round((0.075+snake[i][0])*gap), Math.round((0.075+snake[i][1])*gap), Math.round(0.85*gap), Math.round(0.85*gap));}, 100*i);
+            ctxGame.fillStyle = "hsl(" + Math.round(320*i/(snake.length - 1)).toString() + ", 100%, 50%)";
+            const pad = Math.round(0.075*gap);
+            const padX = pad +snake[i][0]*gap;
+            const padY = pad +snake[i][1]*gap;
+            ctxGame.fillRect(padX, padY, gap-2*pad, gap-2*pad);}, 100*i);
         };
     intervalForm.hidden = false;
     goalForm.hidden = false;
@@ -263,25 +286,23 @@ function gameClear() {
 }
 
 function paintBlock(x, y, color) {
-    ctx.fillStyle = color;
-    ctx.fillRect(Math.round((0.075+x)*gap), Math.round((0.075+y)*gap), Math.round(0.85*gap), Math.round(0.85*gap));
+    ctxGame.fillStyle = color;
+    const pad = Math.round(0.075*gap);
+    const padX = pad + x*gap;
+    const padY = pad + y*gap;
+    ctxGame.fillRect(padX, padY, gap-(2*pad), gap-(2*pad));
 }
 
 
 function removeSnakeTail() {
     const snakeTail = snake.pop();
-    if ((snakeTail[0]+snakeTail[1]) % 2 == 0) {
-        ctx.fillStyle = boardColor1;
-    } else {
-        ctx.fillStyle = boardColor2;
-    };
-    ctx.fillRect(snakeTail[0]*gap, snakeTail[1]*gap, gap, gap);
+    ctxGame.clearRect(snakeTail[0]*gap, snakeTail[1]*gap, gap, gap);
 }
 
 function handleRetryBtn(e) {
     e.preventDefault();
     clearTimeout(timeoutId);
-    ctx.clearRect(0, 0, gameboardW, gameboardH);
+    ctxGame.clearRect(0, 0, gameboardW, gameboardH);
     setSnakeGame();
 }
 

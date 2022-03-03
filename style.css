@@ -1,10 +1,10 @@
 body {
-    /* box-sizing: border-box; */
     margin: 0;
     padding: 0;
 }
 
-/* #gameCanvas { */
-    /* border: 10px solid #964b00; */
-    /* border-right: 5px dashed black; */
-/* } */
+#gameCanvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
